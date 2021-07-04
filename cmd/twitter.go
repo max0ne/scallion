@@ -36,8 +36,7 @@ var (
 // twitterCmd represents the twitter command
 var twitterCmd = &cobra.Command{
 	Use:   "tweet",
-	Short: "",
-	Long:  ``,
+	Short: "post a tweet with an image",
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := run(args); err != nil {
 			zap.S().Panicf("%+v", err)

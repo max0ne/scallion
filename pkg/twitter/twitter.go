@@ -27,7 +27,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -40,18 +39,15 @@ const (
 )
 
 type Twitter struct {
-	httpClient    *http.Client
-	twitterClient *twitter.Client
+	httpClient *http.Client
 }
 
 func New(consumerKey, consumerSecret, accessToken, accessSecret string) *Twitter {
 	config := oauth1.NewConfig(consumerKey, consumerSecret)
 	token := oauth1.NewToken(accessToken, accessSecret)
 	httpClient := config.Client(oauth1.NoContext, token)
-	twitterClient := twitter.NewClient(httpClient)
 	return &Twitter{
-		httpClient:    httpClient,
-		twitterClient: twitterClient,
+		httpClient: httpClient,
 	}
 }
 

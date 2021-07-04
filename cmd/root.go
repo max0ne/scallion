@@ -16,14 +16,11 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-
-	"github.com/max0ne/scallion/pkg/camera"
 )
 
 var (
@@ -32,14 +29,6 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use: "scallion",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		imageFile, err := camera.Capture()
-		if err != nil {
-			return err
-		}
-		fmt.Println(imageFile)
-		return nil
-	},
 }
 
 func Execute() {
