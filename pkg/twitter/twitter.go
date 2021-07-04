@@ -35,7 +35,9 @@ import (
 const (
 	MediaUploadEndpoint  = "https://upload.twitter.com/1.1/media/upload.json"
 	StatusUpdateEndpoint = "https://api.twitter.com/1.1/statuses/update.json"
-	stepSize             = 500 * 1024
+
+	// stepSize is amount of image bytes to upload in each HTTP request
+	stepSize = 500 * 1024
 )
 
 type Twitter struct {
