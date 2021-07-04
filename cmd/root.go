@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 NAME HERE himax1023@gmail.com
+Copyright © 2021 Mingfei Huang <himax1023@gmail.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,25 +16,35 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+)
 
-	"github.com/max0ne/scallion/pkg/camera"
+var (
+	verbose bool
 )
 
 var rootCmd = &cobra.Command{
 	Use: "scallion",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		imageFile, err := camera.Capture()
-		if err != nil {
-			return err
-		}
-		fmt.Println(imageFile)
-		return nil
-	},
 }
 
 func Execute() {
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "")
+
+	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+	core := zapcore.NewCore(consoleEncoder, zapcore.Lock(os.Stderr), zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		if verbose {
+			return lvl >= zapcore.DebugLevel
+		} else {
+			return lvl >= zapcore.InfoLevel
+		}
+	}))
+	logger := zap.New(core)
+	defer logger.Sync()
+	zap.ReplaceGlobals(logger)
+
 	cobra.CheckErr(rootCmd.Execute())
 }
