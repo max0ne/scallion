@@ -12,7 +12,8 @@ if [ "$IMAGE_COUNT" -eq "0" ]; then
 fi
 
 echo "Creating GIF with $IMAGE_COUNT images from $IMAGE_DIR_PATH"
-convert -resize 20% -delay 50 -loop 0 `ls -v1tr "$IMAGE_DIR_PATH"/*.jpg` "$GIF_PATH"
+# delay's unit is 1/100 of a second
+convert -resize 20% -delay 10 -loop 0 `ls -v1tr "$IMAGE_DIR_PATH"/*.jpg` "$GIF_PATH"
 
 echo "Tweeting image capture"
 TWEET_URL=$(scallion tweet -i "$GIF_PATH" -c /etc/scallion/cred.json)
