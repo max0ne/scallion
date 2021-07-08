@@ -2,7 +2,7 @@
 set -e
 
 function image_dir_path {
-  echo "/tmp/scallion/$(date "+%Y-%m-%d")"
+  echo "/var/lib/scallion"
 }
 
 function image_file_name {

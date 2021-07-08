@@ -1,0 +1,2 @@
+*/5 * * * * /bin/cron-wrapper /home/pi/scallion/scripts/capture.sh >> /var/log/scallion.log 2>&1
+0 17 * * * /bin/cron-wrapper /home/pi/scallion/scripts/tweet.sh >> /var/log/scallion.log 2>&1

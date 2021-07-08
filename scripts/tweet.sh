@@ -5,33 +5,45 @@ source "$(dirname "$0")/lib.sh"
 
 IMAGE_DIR_PATH=$(image_dir_path)
 
-# clean up old _small images if there's any
-rm -f "$IMAGE_DIR_PATH"/*_small.jpg
+IMAGES=$(ls -v1tr "$IMAGE_DIR_PATH")
+IMAGE_COUNT=$(echo "$IMAGES" | wc -l)
 
-IMAGE_COUNT=$(ls -1 "$IMAGE_DIR_PATH" | wc -l)
-GIF_PATH="$IMAGE_DIR_PATH/out.gif"
-
-if [ "$IMAGE_COUNT" -eq "0" ]; then
+if [ ! "$(ls $IMAGE_DIR_PATH)" ]; then
   echo "No images from in $IMAGE_DIR_PATH"
+  exit
 fi
 
 echo "Found $IMAGE_COUNT images in $IMAGE_DIR_PATH"
 
-echo "Shrinking images in $IMAGE_DIR_PATH"
-for IMAGE in $(ls "$IMAGE_DIR_PATH"/*.jpg); do
-  echo "Shrinking image $IMAGE"
-  FILE_NAME_NO_EXT=$(basename $IMAGE .jpg)
-  SMALL_IMAGE="$FILE_NAME_NO_EXT"_small.jpg
+TEMPDIR="$(mktemp -d)"
+echo "Using tempdir $TEMPDIR"
 
-  convert -resize 16% "$IMAGE" "$IMAGE_DIR_PATH"/"$SMALL_IMAGE"
+# Copy images to TEMPDIR
+IDX=0
+for IMAGE in $IMAGES; do
+  cp "$IMAGE_DIR_PATH/$IMAGE" "$TEMPDIR/$IDX.jpg"
+  IDX=$(( IDX + 1 ))
 done
 
-echo "Creating GIF with $IMAGE_COUNT images from $IMAGE_DIR_PATH"
+# Encode mp4
+ffmpeg \
+  -framerate 10 \
+  -i "file:$TEMPDIR/%d.jpg" \
+  -c:v libx264 \
+  -profile:v high \
+  -crf 20 \
+  -pix_fmt yuv420p \
+  -vf scale=640:-1 \
+  "$TEMPDIR/output.mp4"
 
-# delay's unit is 1/100 of a second
-convert -delay 10 -loop 0 $(ls -v1tr "$IMAGE_DIR_PATH"/*_small.jpg) "$GIF_PATH"
-
+# Tweet it
 echo "Tweeting image capture"
-TWEET_URL=$(scallion tweet -i "$GIF_PATH" -c /etc/scallion/cred.json)
+TWEET_URL=$(scallion tweet -i "$TEMPDIR/output.mp4" -c /etc/scallion/cred.json)
 
 echo "Tweet sent at $TWEET_URL"
+
+# Cleanup remaining images
+for IMAGE in $IMAGES; do
+  rm "$IMAGE"
+done
+rm -r "$TEMPDIR"
