@@ -25,9 +25,14 @@ for IMAGE in $IMAGES; do
   IDX=$(( IDX + 1 ))
 done
 
+# Twitter allow maximum 30 sec video
+# divide and ceil IMAGE_COUNT by 30 sec to get the framerate that can fit all images into 30 sec
+MAX_VIDEO_SECONDS=30
+FRAMERATE=$(( (IMAGE_COUNT + MAX_VIDEO_SECONDS - 1) / MAX_VIDEO_SECONDS ))
+
 # Encode mp4
 ffmpeg \
-  -framerate 10 \
+  -framerate "$FRAMERATE" \
   -i "file:$TEMPDIR/%d.jpg" \
   -c:v libx264 \
   -profile:v high \
@@ -43,7 +48,4 @@ TWEET_URL=$(scallion tweet -i "$TEMPDIR/output.mp4" -c /etc/scallion/cred.json)
 echo "Tweet sent at $TWEET_URL"
 
 # Cleanup remaining images
-for IMAGE in $IMAGES; do
-  rm "$IMAGE"
-done
 rm -r "$TEMPDIR"
