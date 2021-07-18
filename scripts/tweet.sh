@@ -47,5 +47,8 @@ TWEET_URL=$(scallion tweet -i "$TEMPDIR/output.mp4" -c /etc/scallion/cred.json)
 
 echo "Tweet sent at $TWEET_URL"
 
-# Cleanup remaining images
+# Cleanup
 rm -r "$TEMPDIR"
+for IMAGE in $IMAGES; do
+  rm "$IMAGE_DIR_PATH/$IMAGE"
+done
